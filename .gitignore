@@ -1,0 +1,4 @@
+*.db
+.venv/
+applicable_jobs.yaml
+config.yaml

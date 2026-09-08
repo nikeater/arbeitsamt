@@ -1,0 +1,22 @@
+db: jobs.db
+LlmAdress: "http://localhost:8080/v1"
+abruf:
+  # Staedte mit Umkreis in km. Leer = einmal bundesweit.
+  staedte:
+    Berlin: 10
+    Frankfurt: 15
+    Köln: 10
+
+  suchbegriffe: []        # leer = alles nehmen, nur nach Ort eingegrenzt
+  nichtBeruf: [
+    altenpfleger,
+    koch,
+    krankenpfleger,
+    sap,
+  ]
+  veroeffentlichtseit: 15 # Tage, max 100
+  size: 100 # Treffer pro Seite
+  max_pages: 5           # Deckel pro Suche
+  sleep: 3.0              # Sekunden zwischen Requests
+  details: true           # Volltexte nachladen, ein Request pro Stelle
+  details_limit: 9000 # pro Lauf
