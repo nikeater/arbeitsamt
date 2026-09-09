@@ -1,4 +1,5 @@
 import sqlite3, json, yaml
+import time
 from pathlib import Path
 from openai import OpenAI
 
@@ -14,7 +15,8 @@ l_conn.execute("""
     level TEXT,
     reason TEXT,
     prompt TEXT,
-    model TEXT)
+    model TEXT
+    inference_time NUMBER)
     """)
 l_conn.commit()
 jobs = l_conn.execute("""
@@ -38,6 +40,7 @@ client = OpenAI(
         )
 
 for job in jobs:
+    begin = int(time.time())
     frage = f'''Wie gut ist diese Stelle mit folgender Beschreibung:
 {job[2]}
 ...für einen Kandidaten mit folgendem CV geeignet:
@@ -71,11 +74,13 @@ Der Kandidat ist bereit umzuziehen'''
     level = antwort["level"]
     reason = antwort["reason"]
     model = response.model
-    print(f"{job[1]} ({job[0]}): {level}, {reason}")
+    end =  int(time.time())
+    inference_time = end - begin
+    print(f"{job[1]} ({job[0]}): {level}, {reason} ({duration})")
     l_conn.execute("""
     INSERT OR IGNORE INTO einstufung(
-    check_id, refnr, level, reason, prompt, model
-    ) VALUES (?,?,?,?,?,?)
+    check_id, refnr, level, reason, prompt, model, inference_time
+    ) VALUES (?,?,?,?,?,?,?)
                """,
                    (
                        check_id,
@@ -84,6 +89,7 @@ Der Kandidat ist bereit umzuziehen'''
                        reason,
                        prompt,
                        model,
+                       inference_time
                        ))
     l_conn.commit()
 l_conn.close()
