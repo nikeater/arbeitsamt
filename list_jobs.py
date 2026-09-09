@@ -30,6 +30,7 @@ jobs = l_conn.execute("""
         e.level,
         j.bewerbung,
         j.job_title,
+        j.plz,
         j.refnr,
         j.details
     FROM jobdb.jobs AS j
