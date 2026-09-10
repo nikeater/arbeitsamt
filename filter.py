@@ -23,7 +23,7 @@ jobs = l_conn.execute("""
 SELECT j.refnr, j.job_title, j.details FROM jobdb.jobs j
 WHERE NOT EXISTS (
                SELECT 1 FROM main.einstufung e 
-               WHERE e.refnr = j.refnr
+               WHERE e.refnr = j.refnr AND j.details IS NOT NULL
                )
 ORDER BY j.seit DESC
                """).fetchall()

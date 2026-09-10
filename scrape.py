@@ -11,8 +11,8 @@ HEADERS = {"X-API-Key": "jobboerse-jobsuche",
 
 voll = yaml.safe_load(open("config.yaml", encoding="utf-8"))
 cfg = voll["abruf"]
-db = sqlite3.connect(voll["db"])
-db.execute("""
+j_conn = sqlite3.connect(voll["j_conn"])
+j_conn.execute("""
     CREATE TABLE IF NOT EXISTS jobs (
     refnr TEXT PRIMARY KEY,
     first_seen TEXT,
@@ -21,7 +21,9 @@ db.execute("""
     seit DATE,
     plz NUMBER,
     raw TEXT,
-    details TEXT)
+    details TEXT,
+    bewerbung TEXT,
+    anschreiben TEXT)
     """)
 
 def get(url, params=None, versuch=1):
@@ -65,7 +67,7 @@ for was in cfg["suchbegriffe"] or [None]:
             print(seit)
             plz = it.get("plz")
             n += 1
-            neu += db.execute("INSERT OR IGNORE INTO jobs (refnr, first_seen, source, job_title, seit, plz, raw) VALUES (?,?,?,?,?,?,?)",
+            neu += j_conn.execute("INSERT OR IGNORE INTO jobs (refnr, first_seen, source, job_title, seit, plz, raw) VALUES (?,?,?,?,?,?,?)",
                               (
                                   refnr,
                                   now,
@@ -74,21 +76,21 @@ for was in cfg["suchbegriffe"] or [None]:
                                   seit,
                                   plz,
                                   json.dumps(it, ensure_ascii=False))).rowcount
-        db.commit()
+        j_conn.commit()
         print(f"{was or '*'} @ {wo or '*'}: {n} Treffer, {neu} neu")
         time.sleep(cfg["sleep"])
 
 if cfg["details"]:
-    offen = [r[0] for r in db.execute(
+    offen = [r[0] for r in j_conn.execute(
         "SELECT refnr FROM jobs WHERE details IS NULL LIMIT ?", (cfg["details_limit"],))]
     print(f"Details fuer {len(offen)} Stellen")
     for i, refnr in enumerate(offen, 1):
         d = get(f"{BASE}/pc/v4/jobdetails/{base64.b64encode(refnr.encode()).decode()}")
-        db.execute("UPDATE jobs SET details=? WHERE refnr=?",
+        j_conn.execute("UPDATE jobs SET details=? WHERE refnr=?",
                    (d.get("stellenangebotsBeschreibung"), refnr))
-        if i % 25 == 0: db.commit(); print(f"  {i}/{len(offen)}")
+        if i % 25 == 0: j_conn.commit(); print(f"  {i}/{len(offen)}")
         time.sleep(cfg["sleep"])
-    db.commit()
+    j_conn.commit()
 
-print("gesamt in db:", db.execute("SELECT count(*) FROM jobs").fetchone()[0])
-db.close()
+print("gesamt in j_conn:", j_conn.execute("SELECT count(*) FROM jobs").fetchone()[0])
+j_conn.close()
