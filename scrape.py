@@ -11,7 +11,7 @@ HEADERS = {"X-API-Key": "jobboerse-jobsuche",
 
 voll = yaml.safe_load(open("config.yaml", encoding="utf-8"))
 cfg = voll["abruf"]
-j_conn = sqlite3.connect(voll["j_conn"])
+j_conn = sqlite3.connect(voll["db"])
 j_conn.execute("""
     CREATE TABLE IF NOT EXISTS jobs (
     refnr TEXT PRIMARY KEY,

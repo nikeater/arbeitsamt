@@ -21,14 +21,17 @@ l_conn.execute("""
 l_conn.commit()
 jobs = l_conn.execute("""
 SELECT j.refnr, j.job_title, j.details FROM jobdb.jobs j
-WHERE NOT EXISTS (
-               SELECT 1 FROM main.einstufung e 
-               WHERE e.refnr = j.refnr AND j.details IS NOT NULL
-               )
+WHERE j.details IS NOT NULL
+    AND TRIM(j.details) <> ''
+    AND NOT EXISTS (
+       SELECT 1 FROM main.einstufung e 
+       WHERE e.refnr = j.refnr
+       )
 ORDER BY j.seit DESC
                """).fetchall()
 
-
+if len(jobs) == 0:
+    print("No jobs found!")
 with open(Path.home() / ".config/io.datasette.llm/keys.json", "r") as f:
     keys = json.load(f)
 with open(Path.home() / "Documents/Bewerbungen/cv_deutsch.yaml", "r") as f:
@@ -76,7 +79,7 @@ Der Kandidat ist bereit umzuziehen'''
     model = response.model
     end =  int(time.time())
     inference_time = end - begin
-    print(f"{job[1]} ({job[0]}): {level}, {reason} ({duration})")
+    print(f"{job[1]} ({job[0]}): {level}, {reason} ({inference_time})")
     l_conn.execute("""
     INSERT OR IGNORE INTO einstufung(
     check_id, refnr, level, reason, prompt, model, inference_time

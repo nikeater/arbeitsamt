@@ -6,7 +6,6 @@ from openai import OpenAI
 job_db = Path("jobs.db").resolve()
 j_conn = sqlite3.connect(job_db)
 
-# jobs aus jobs getten, wo in einstufung für refnr 
 jobs = j_conn.execute("""
 SELECT refnr, job_title, details FROM jobs
 WHERE bewerbung = "write"
@@ -26,16 +25,16 @@ client = OpenAI(
 for job in jobs:
     begin = int(time.time())
     prompt = f"""
-    Du hast einen Kandidaten mit folgendem CV: 
+    Das ist mein Lebenslauf: 
     {cv}
-    ...der sich auf diese Stelle als {job[1]} bewirbt:
+    ...ich bewerbe mich als {job[1]}:
     {job[2]}
-    schreibe ein kurzes Anschreiben. Gib mir nur den Inhalt.
+    ich möchte ein kurzes Anschreiben haben. Gib mir nur den Inhalt.
     """
     response = client.chat.completions.create(
         model="local-model",  # name doesn't matter much, server ignores it usually
         messages=[
-            {"role": "system", "content": "Du bist ein deutscher Karriereberater"},
+            {"role": "system", "content": f"Du bist {voll["name"]}"},
             {"role": "user", "content": prompt}
         ],
         temperature=0.7,
@@ -49,6 +48,6 @@ for job in jobs:
     print(anschreiben)
     print(inference_time)
     j_conn.execute('UPDATE jobs SET anschreiben=?, bewerbung="written" WHERE refnr=?',
-               (anschreiben, jobs[0]))
+               (anschreiben, job[0]))
     j_conn.commit()
 j_conn.close()
