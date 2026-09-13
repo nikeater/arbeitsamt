@@ -5,12 +5,14 @@ offen = j_conn.execute("SELECT refnr FROM jobs WHERE details IS NULL ORDER BY se
 print(f"Details fuer {len(offen)} Stellen")
 for i, refnr in enumerate(offen, 1):
     refnr = refnr[0]
-    refnr = base64.b64encode(refnr.encode()).decode()
-    d = get(f"{BASE}/pc/v4/jobdetails/{refnr}")
+    d = get(f"{BASE}/pc/v4/jobdetails/{base64.b64encode(refnr.encode()).decode()}")
     if d is not None:
         j_conn.execute("UPDATE jobs SET details=? WHERE refnr=?",
                    (d.get("stellenangebotsBeschreibung"), refnr))
-    if i % 10 == 0: j_conn.commit(); print(f"  {i}/{len(offen)}")
+    else:
+        print("no details found")
+        j_conn.execute(f'UPDATE jobs SET details="empty" WHERE refnr=?', (refnr,))
+    if i % 5 == 0: j_conn.commit(); print(f"  {i}/{len(offen)}")
     time.sleep(cfg["sleep"])
 j_conn.commit()
 

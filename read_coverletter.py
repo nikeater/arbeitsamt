@@ -9,11 +9,8 @@ j_conn = sqlite3.connect(job_db)
 # jobs aus jobs getten, wo in einstufung für refnr 
 jobs = j_conn.execute("""
 SELECT refnr, job_title, details, firma, anschreiben FROM jobs
-WHERE bewerbung = "write"
+WHERE bewerbung = "written"
                """).fetchall()
-
-if firma is not None:
-    firma = " von " + firma
 
 with open(Path.home() / ".config/io.datasette.llm/keys.json", "r") as f:
     keys = json.load(f)
@@ -24,10 +21,16 @@ client = OpenAI(
         base_url=voll["LlmAdress"],
         api_key=keys["llamaserver"],
         )
-
+if len(jobs) == 0:
+    print("No written coverletters found!")
 for job in jobs:
+    firma = job[3]
+    if firma is not None:
+        firma = " von " + firma
+    else:
+        firma = ""
     begin = int(time.time())
-    prompt = f"""
+    frage = f"""
 Du suchst einen Kandidaten für die Position {job[1]}.
 Du hast dieses Anschreiben erhalten:
     {job[4]}
@@ -74,13 +77,9 @@ Welche Fragen würdest Du stellen?
     print(job[1])
     print(inference_time)
     j_conn.execute('''
-    UPDATE jobs SET (
-        fit = ?, 
-        strengths = ?, 
-        lacking = ?, 
-        fragen = ?, 
-    )bewerbung="readen" WHERE refnr=?
-                   ''',
+    UPDATE jobs SET fit=?, strengths=?, lacking=?, fragen=?, bewerbung="gereadet"
+    WHERE refnr=?
+    ''',
                (fit, strengths, lacking, fragen, job[0]))
     j_conn.commit()
 j_conn.close()

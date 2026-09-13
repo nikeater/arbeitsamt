@@ -23,6 +23,7 @@ jobs = l_conn.execute("""
 SELECT j.refnr, j.job_title, j.details FROM jobdb.jobs j
 WHERE j.details IS NOT NULL
     AND TRIM(j.details) <> ''
+    AND j.details != 'empty'
     AND NOT EXISTS (
        SELECT 1 FROM main.einstufung e 
        WHERE e.refnr = j.refnr
