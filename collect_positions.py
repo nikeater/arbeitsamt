@@ -43,6 +43,7 @@ def get_positions():
         job_title TEXT,
         seit DATE,
         plz NUMBER,
+        ort TEXT,
         raw TEXT,
         details TEXT,
         bewerbung TEXT,
@@ -58,6 +59,7 @@ def get_positions():
         for wo, km in orte:
             n = neu = 0
             for it in suche(was, wo, km):
+                print(it)
                 refnr = it.get("referenznummer")
                 job_title = it.get("stellenangebotsTitel")
                 seit = it.get("datumErsteVeroeffentlichung")
@@ -66,10 +68,21 @@ def get_positions():
                 if any(b in job_title.lower() for b in cfg["nichtBeruf"]):
                     print(f"{job_title} skipped!")
                     continue
-                print(seit)
-                plz = it.get("plz")
+                stellenlokation = it.get("stellenlokationen")
+                try:
+                    plz = stellenlokation[0]['adresse']['plz']
+                except KeyError:
+                    plz = 99999
+                ort = stellenlokation[0]['adresse']['ort']
+                firma = it.get("firma")
+                print(ort)
+                print(firma)
                 n += 1
-                neu += j_conn.execute("INSERT OR IGNORE INTO jobs (refnr, first_seen, source, job_title, seit, plz, raw) VALUES (?,?,?,?,?,?,?)",
+                neu += j_conn.execute("""
+        INSERT OR IGNORE INTO jobs 
+              (refnr, first_seen, source, job_title, seit, plz, ort, firma, raw)
+              VALUES (?,?,?,?,?,?,?,?,?)
+                                      """,
                                   (
                                       refnr,
                                       now,
@@ -77,6 +90,8 @@ def get_positions():
                                       job_title,
                                       seit,
                                       plz,
+                                      ort,
+                                      firma,
                                       json.dumps(it, ensure_ascii=False))).rowcount
             j_conn.commit()
             print(f"{was or '*'} @ {wo or '*'}: {n} Treffer, {neu} neu")

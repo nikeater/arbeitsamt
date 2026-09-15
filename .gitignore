@@ -1,4 +1,6 @@
 *.db
 .venv/
 applicable_jobs.yaml
+running_applications.yaml
 config.yaml
+output/*

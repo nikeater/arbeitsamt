@@ -29,7 +29,7 @@ for job in jobs:
     {cv}
     ...ich bewerbe mich als {job[1]}:
     {job[2]}
-    ich möchte ein kurzes Anschreiben haben. Gib mir nur den Inhalt.
+    ich möchte ein kurzes Anschreiben haben. Gib mir nur den Inhalt. Keine Anrede, Keine Grußformel.
     """
     response = client.chat.completions.create(
         model="local-model",  # name doesn't matter much, server ignores it usually

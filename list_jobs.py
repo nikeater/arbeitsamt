@@ -12,9 +12,19 @@ try:
             continue
         else:
             print(f'updating bewerbungstatus to {a_job["bewerbung"]}')
-        j_conn.execute("UPDATE jobs SET bewerbung=? WHERE refnr=?",
-               (a_job["bewerbung"], a_job["refnr"])
-                       )
+        j_conn.execute('''
+        UPDATE jobs SET bewerbung=?, firma=?, plz=?, ort=?, kontakt=?
+        WHERE refnr=?
+        ''',
+               (
+               a_job["bewerbung"],
+               a_job["firma"],
+               a_job["plz"],
+               a_job["ort"],
+               a_job["kontakt"],
+               a_job["refnr"],
+               )
+                    )
         j_conn.commit()
     j_conn.close()
 except FileNotFoundError:
@@ -32,6 +42,8 @@ jobs = l_conn.execute("""
         j.job_title,
         j.firma,
         j.plz,
+        j.ort,
+        j.kontakt,
         j.refnr,
         j.details
     FROM jobdb.jobs AS j
@@ -45,7 +57,8 @@ jobs = l_conn.execute("""
 l_conn.close()
 
 row_list = [dict(row) for row in jobs]
+print(row_list[0])
 
 with open("applicable_jobs.yaml", "w", encoding="utf-8") as f:
-    yaml.safe_dump(row_list, f, allow_unicode=True)
+    yaml.safe_dump(row_list, f, allow_unicode=True, sort_keys=False)
 print(len(jobs))

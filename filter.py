@@ -3,6 +3,12 @@ import time
 from pathlib import Path
 from openai import OpenAI
 
+with open(Path.home() / ".config/io.datasette.llm/keys.json", "r") as f:
+    keys = json.load(f)
+with open(Path.home() / "Documents/Bewerbungen/cv_deutsch.yaml", "r") as f:
+    cv = yaml.safe_load(f)
+voll = yaml.safe_load(open("config.yaml", encoding="utf-8"))
+
 job_db = Path("jobs.db").resolve()
 l_conn = sqlite3.connect("levels.db")
 
@@ -15,7 +21,8 @@ l_conn.execute("""
     level TEXT,
     reason TEXT,
     prompt TEXT,
-    model TEXT
+    model TEXT,
+    kontakt TEXT,
     inference_time NUMBER)
     """)
 l_conn.commit()
@@ -33,11 +40,6 @@ ORDER BY j.seit DESC
 
 if len(jobs) == 0:
     print("No jobs found!")
-with open(Path.home() / ".config/io.datasette.llm/keys.json", "r") as f:
-    keys = json.load(f)
-with open(Path.home() / "Documents/Bewerbungen/cv_deutsch.yaml", "r") as f:
-    cv = yaml.safe_load(f)
-voll = yaml.safe_load(open("config.yaml", encoding="utf-8"))
 client = OpenAI(
         base_url=voll["LlmAdress"],
         api_key=keys["llamaserver"],
@@ -49,7 +51,7 @@ for job in jobs:
 {job[2]}
 ...für einen Kandidaten mit folgendem CV geeignet:
 {cv}
-Der Kandidat ist bereit umzuziehen'''
+Der Kandidat ist bereit umzuziehen, hat gute praktische Python-Skills, wie auf github zu sehen und ist unter anderem an quantitativen Rollen interessiert.'''
     anweisung = '''
     Gib die Antwort als Json:
     {
