@@ -41,11 +41,11 @@ def render(
         empfaenger = firma
     else:
         empfaenger = str(plz)+' '+ort
-        empfaenger = firma + '\\' + empfaenger
+        empfaenger = firma + '\\\\' + empfaenger
     if firma_addr:
-        empfaenger = firma_addr + '\\' + empfaenger
+        empfaenger = firma_addr + '\\\\' + empfaenger
     if kontakt:
-        empfaenger = kontakt + '\\' + empfaenger
+        empfaenger = kontakt + '\\\\' + empfaenger
 
     # Anrede
     anrede_line = "Sehr geehrte Damen und Herren,"
