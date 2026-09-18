@@ -29,12 +29,17 @@ for job in jobs:
     {cv}
     ...ich bewerbe mich als {job[1]}:
     {job[2]}
-    ich möchte ein kurzes Anschreiben haben. Gib mir nur den Inhalt. Keine Anrede, Keine Grußformel.
+    ich möchte ein kurzes Anschreiben haben. Gib mir nur den Inhalt. 
+    KEINE ANREDE.
+    KEINE GRUẞFORMEL.
     """
     response = client.chat.completions.create(
         model="local-model",  # name doesn't matter much, server ignores it usually
         messages=[
-            {"role": "system", "content": f"Du bist {voll["name"]}"},
+            {
+                "role": "system", 
+                "content": f'Du bist {cv["person"]["vorname"]+" "+cv["person"]["nachname"]}'
+                },
             {"role": "user", "content": prompt}
         ],
         temperature=0.7,
@@ -47,7 +52,11 @@ for job in jobs:
     print(job[1])
     print(anschreiben)
     print(inference_time)
-    j_conn.execute('UPDATE jobs SET anschreiben=?, bewerbung="written" WHERE refnr=?',
-               (anschreiben, job[0]))
+    j_conn.execute('''
+    UPDATE jobs 
+    SET anschreiben=?, bewerbung="written", write_prompt=? 
+    WHERE refnr=?
+    ''',
+               (anschreiben, prompt, job[0]))
     j_conn.commit()
 j_conn.close()

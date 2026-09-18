@@ -1,5 +1,6 @@
 import sqlite3, json, yaml
 import time
+import dicttoxml
 from pathlib import Path
 from openai import OpenAI
 
@@ -47,10 +48,11 @@ client = OpenAI(
 
 for job in jobs:
     begin = int(time.time())
+    xml_cv = dicttoxml.dicttoxml(cv).decode()
     frage = f'''Wie gut ist diese Stelle mit folgender Beschreibung:
 {job[2]}
 ...für einen Kandidaten mit folgendem CV geeignet:
-{cv}
+{xml_cv}
 Der Kandidat ist bereit umzuziehen, hat gute praktische Python-Skills, wie auf github zu sehen und ist unter anderem an quantitativen Rollen interessiert.'''
     anweisung = '''
     Gib die Antwort als Json:

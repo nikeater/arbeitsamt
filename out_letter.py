@@ -3,6 +3,8 @@ import re
 import sqlite3
 from pathlib import Path
 from dataclasses import dataclass
+from slugify import slugify
+from unidecode import unidecode
 import render_letter
 
 @dataclass
@@ -28,15 +30,12 @@ def get_ort(plz):
     else:
         sys.exit()
 
-def first_word_letters_only(s):
-    first = s.split(None, 1)[0] if s.split() else ""
-    return re.sub(r'[^a-zA-Z]', '', first).lower()
-
 def main():
     jobs = j_conn.execute('''
     SELECT refnr, plz, ort, firma, job_title, kontakt, anschreiben
     FROM jobs
     WHERE bewerbung = "written" OR bewerbung = "gereadet"
+    ORDER BY seit ASC
                    ''').fetchall()
     for job in jobs:
         firma_addr = None
@@ -45,6 +44,8 @@ def main():
         if ort is None:
             ort = get_ort(plz)
         firma = job[3]
+        if firma is None:
+            firma = '99999'
         job_title = job[4] 
         kontakt = job[5]
         anschreiben = job[6]
@@ -60,10 +61,20 @@ def main():
                 kontakt,
                 anschreiben
                 )
-        out = Path("output") / f"anschreiben_{first_word_letters_only(firma)}.tex"
+        firma_s = unidecode(slugify(firma))
+        print(firma)
+        print(firma_s)
+        out = Path("output") / f"anschreiben_{firma_s}.tex"
+        i = 1
+        # while out.exists():
+        #    out = Path("output") / f'anschreiben_{firma_s+"_"+str(i)}.tex'
+        #    i += 1
         out.write_text(tex, encoding="utf-8")
         print(f"  → {out}")
-
+        j_conn.execute('''
+        UPDATE jobs SET bewerbung="rendered"
+        WHERE refnr=?
+        ''', (job[0],))
 
 if __name__ == "__main__":
     main()

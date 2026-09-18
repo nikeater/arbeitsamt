@@ -59,7 +59,6 @@ def get_positions():
         for wo, km in orte:
             n = neu = 0
             for it in suche(was, wo, km):
-                print(it)
                 refnr = it.get("referenznummer")
                 job_title = it.get("stellenangebotsTitel")
                 seit = it.get("datumErsteVeroeffentlichung")

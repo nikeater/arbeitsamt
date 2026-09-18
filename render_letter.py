@@ -40,7 +40,7 @@ def render(
     if plz is None:
         empfaenger = firma
     else:
-        empfaenger = plz+' '+ort
+        empfaenger = str(plz)+' '+ort
         empfaenger = firma + '\\' + empfaenger
     if firma_addr:
         empfaenger = firma_addr + '\\' + empfaenger
@@ -88,7 +88,7 @@ def render(
 \address{{{p['adresse']['strasse']}}}{{{p['adresse']['plz']}}}{{}}
 \phone[mobile]{{{me_kontakt['mobil']}}}
 \email{{{me_kontakt['email']}}}
-\git{{{me_kontakt['github']}}}
+\social[github]{{{me_kontakt['github']}}}
 
 % ── Letter fields ────────────────────────────────────────────────────
 \recipient{{{empfaenger}}}{{}}

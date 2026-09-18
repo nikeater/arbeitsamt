@@ -57,7 +57,6 @@ jobs = l_conn.execute("""
 l_conn.close()
 
 row_list = [dict(row) for row in jobs]
-print(row_list[0])
 
 with open("applicable_jobs.yaml", "w", encoding="utf-8") as f:
     yaml.safe_dump(row_list, f, allow_unicode=True, sort_keys=False)
