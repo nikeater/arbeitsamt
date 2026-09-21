@@ -13,7 +13,7 @@ jobs = l_conn.execute("""
     FROM jobdb.jobs AS j
     JOIN einstufung AS e
       ON j.refnr = e.refnr
-    WHERE e.level = "Gar nicht"
+    WHERE e.level = "Eher nicht"
     ORDER BY e.check_id ASC
                """).fetchall()
 
