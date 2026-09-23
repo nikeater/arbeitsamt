@@ -1,6 +1,8 @@
-import sqlite3, base64, time
+import sqlite3, base64, time, yaml
 from collect_positions import get, cfg, BASE
-j_conn = sqlite3.connect("jobs.db")
+
+voll = yaml.safe_load(open("config.yaml", encoding="utf-8"))
+j_conn = sqlite3.connect(voll['JobDb'])
 offen = j_conn.execute("SELECT refnr FROM jobs WHERE details IS NULL ORDER BY seit DESC").fetchall()
 print(f"Details fuer {len(offen)} Stellen")
 for i, refnr in enumerate(offen, 1):

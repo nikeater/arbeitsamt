@@ -34,8 +34,8 @@ def suche(was, wo, umkreis):
         time.sleep(cfg["sleep"])
 
 def get_positions():
-    j_conn = sqlite3.connect(voll["db"])
-    j_conn.execute("""
+    j_conn = sqlite3.connect(voll['JobDb'])
+    j_conn.execute('''
         CREATE TABLE IF NOT EXISTS jobs (
         refnr TEXT PRIMARY KEY,
         first_seen TEXT,
@@ -48,7 +48,7 @@ def get_positions():
         details TEXT,
         bewerbung TEXT,
         anschreiben TEXT)
-        """)
+        ''') 
 
 
     now = datetime.now().isoformat(timespec="seconds")

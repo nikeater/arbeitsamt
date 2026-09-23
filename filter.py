@@ -4,14 +4,14 @@ import dicttoxml
 from pathlib import Path
 from openai import OpenAI
 
-with open(Path.home() / ".config/io.datasette.llm/keys.json", "r") as f:
-    keys = json.load(f)
-with open(Path.home() / "Documents/Bewerbungen/cv_deutsch.yaml", "r") as f:
-    cv = yaml.safe_load(f)
 voll = yaml.safe_load(open("config.yaml", encoding="utf-8"))
+with open(voll["LlmApiKey"], "r") as f:
+    keys = json.load(f)
+with open(voll["CvPath"], "r") as f:
+    cv = yaml.safe_load(f)
 
-job_db = Path("jobs.db").resolve()
-l_conn = sqlite3.connect("levels.db")
+job_db = Path(voll["JobDb"]).resolve()
+l_conn = sqlite3.connect(voll['LevelDb'])
 
 # jobs aus jobs getten, wo in einstufung für refnr 
 l_conn.execute("ATTACH DATABASE ? AS jobdb", (str(job_db),))

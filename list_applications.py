@@ -1,7 +1,8 @@
 import sqlite3, json, yaml
 from pathlib import Path
 
-job_db = Path("jobs.db").resolve()
+voll = yaml.safe_load(open("config.yaml", encoding="utf-8"))
+job_db = Path(voll['JobDb']).resolve()
 try:
     with open(Path("running_applications.yaml"), "r") as f:
         running_applications = yaml.safe_load(f)
