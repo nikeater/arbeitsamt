@@ -3,7 +3,7 @@ import time
 from pathlib import Path
 from openai import OpenAI
 
-job_db = Path("jobs.db").resolve()
+job_db = Path(voll['JobDb']).resolve()
 j_conn = sqlite3.connect(job_db)
 
 jobs = j_conn.execute("""
@@ -12,9 +12,9 @@ WHERE bewerbung = "write"
                """).fetchall()
 
 
-with open(Path.home() / ".config/io.datasette.llm/keys.json", "r") as f:
+with open(voll['LlmApiKey'], "r") as f:
     keys = json.load(f)
-with open(Path.home() / "Documents/Bewerbungen/cv_deutsch.yaml", "r") as f:
+with open(voll['CvPath'], "r") as f:
     cv = yaml.safe_load(f)
 voll = yaml.safe_load(open("config.yaml", encoding="utf-8"))
 client = OpenAI(

@@ -1,7 +1,8 @@
 import sqlite3, json, yaml
 from pathlib import Path
 
-job_db = Path("jobs.db").resolve()
+voll = yaml.safe_load(open("config.yaml", encoding="utf-8"))
+job_db = Path(voll["JobDb"]).resolve()
 try:
     with open(Path("applicable_jobs.yaml"), "r") as f:
         applicable_jobs = yaml.safe_load(f)
@@ -29,7 +30,7 @@ try:
     j_conn.close()
 except FileNotFoundError:
     pass
-l_conn = sqlite3.connect("levels.db")
+l_conn = sqlite3.connect(voll['LevelDb'])
 
 # jobs aus jobs getten, wo in einstufung für refnr 
 l_conn.execute("ATTACH DATABASE ? AS jobdb", (str(job_db),))
