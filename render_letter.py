@@ -37,7 +37,7 @@ def render(
     me_kontakt = p["kontakt"]
 
     # Empfänger
-    if plz is None or if plz is 99999:
+    if plz is None or plz is 99999:
         empfaenger = firma
     else:
         empfaenger = str(plz)+' '+ort

@@ -3,9 +3,7 @@ import time
 from pathlib import Path
 from openai import OpenAI
 
-job_db = Path(voll['JobDb']).resolve()
-j_conn = sqlite3.connect(job_db)
-
+j_conn = sqlite3.connect(voll['JobDb'])
 # jobs aus jobs getten, wo in einstufung für refnr 
 jobs = j_conn.execute("""
 SELECT refnr, job_title, details, firma, anschreiben FROM jobs
