@@ -71,10 +71,13 @@ def main():
         #    i += 1
         out.write_text(tex, encoding="utf-8")
         print(f"  → {out}")
+        print(job[0])
         j_conn.execute('''
-        UPDATE jobs SET bewerbung="rendered"
+        UPDATE jobs 
+        SET bewerbung="rendered"
         WHERE refnr=?
         ''', (job[0],))
+        j_conn.commit()
 
 if __name__ == "__main__":
     main()
