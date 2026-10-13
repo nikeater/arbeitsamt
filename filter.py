@@ -71,7 +71,7 @@ Der Kandidat ist bereit umzuziehen, hat gute praktische Python-Skills, wie auf g
             {"role": "user", "content": prompt}
         ],
         temperature=0.7,
-        max_tokens=3096,
+        max_tokens=256000,
     )
     max_id = l_conn.execute("SELECT MAX(check_id) FROM einstufung").fetchone()[0]
     if max_id is None:

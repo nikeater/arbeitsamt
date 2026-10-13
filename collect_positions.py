@@ -65,7 +65,7 @@ def get_positions():
                 if not refnr: continue
                 if job_title is None: continue
                 if any(b in job_title.lower() for b in cfg["nichtBeruf"]):
-                    print(f"{job_title} skipped!")
+                    print(f"=> skipped!")
                     continue
                 stellenlokation = it.get("stellenlokationen")
                 try:
@@ -74,8 +74,7 @@ def get_positions():
                     plz = 99999
                 ort = stellenlokation[0]['adresse']['ort']
                 firma = it.get("firma")
-                print(ort)
-                print(firma)
+                print(f"{seit} {ort}, {firma}: {job_title}")
                 n += 1
                 neu += j_conn.execute("""
         INSERT OR IGNORE INTO jobs 
